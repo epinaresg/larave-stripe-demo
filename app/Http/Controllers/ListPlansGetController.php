@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\UseCases\GetPlanPriceUseCase;
+use App\UseCases\GetUserAsStripeCustomerUseCase;
 
 class ListPlansGetController extends Controller
 {
@@ -14,6 +15,10 @@ class ListPlansGetController extends Controller
 
     public function __invoke()
     {
+        $email = 'epinaresg@gmail.com';
+
+        (new GetUserAsStripeCustomerUseCase())->__invoke($email);
+
         return view('list-plans', [
             'byMonth' => [
                 'bronze' => $this->useCase->__invoke('bronze'),

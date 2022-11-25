@@ -1,12 +1,10 @@
 <?php
 
-use App\Http\Controllers\BuildSimpleChargePageGetController;
+use App\Http\Controllers\BuildSaveCardPageGetController;
+use App\Http\Controllers\BuildSimplePaymentPageGetController;
 use App\Http\Controllers\ListPlansGetController;
-use App\Models\User;
+use App\Http\Controllers\SaveCardPostController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Stripe\Stripe;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,6 +17,10 @@ use Stripe\Stripe;
 |
 */
 Route::get('/', ListPlansGetController::class);
-Route::get('/simple-charge/checkout/{plan}', BuildSimpleChargePageGetController::class);
+
+Route::get('/save-card', BuildSaveCardPageGetController::class);
+Route::post('/save-card', SaveCardPostController::class);
+
+Route::get('/simple-payment/checkout/{plan}', BuildSimplePaymentPageGetController::class);
 
 Route::stripeWebhooks('stripe/webhook');

@@ -5,12 +5,11 @@ namespace App\Http\Controllers;
 use App\UseCases\GetPlanPriceUseCase;
 use App\UseCases\GetUserAsStripeCustomerUseCase;
 
-class BuildSimpleChargePageGetController extends Controller
+class BuildSimplePaymentPageGetController extends Controller
 {
     public function __invoke(string $plan)
     {
-        $email = 'america78@example.com';
-
+        $email = 'epinaresg@gmail.com';
 
         $user = (new GetUserAsStripeCustomerUseCase())->__invoke($email);
 
@@ -22,7 +21,8 @@ class BuildSimpleChargePageGetController extends Controller
             $priceToInteger
         );
 
-        return view('simple-charge', [
+        return view('simple-payment', [
+            'plan' => $plan,
             'client_secret' => $payment->client_secret
         ]);
     }

@@ -25,37 +25,68 @@
             }
 
             form {
-                width: 30vw;
-                min-width: 500px;
-                align-self: center;
-                box-shadow: 0px 0px 0px 0.5px rgba(50, 50, 93, 0.1),
-                    0px 2px 5px 0px rgba(50, 50, 93, 0.1), 0px 1px 1.5px 0px rgba(0, 0, 0, 0.07);
-                border-radius: 7px;
-                padding: 40px;
+            width: 30vw;
+            min-width: 500px;
+            align-self: center;
+            box-shadow: 0px 0px 0px 0.5px rgba(50, 50, 93, 0.1),
+                0px 2px 5px 0px rgba(50, 50, 93, 0.1), 0px 1px 1.5px 0px rgba(0, 0, 0, 0.07);
+            border-radius: 7px;
+            padding: 40px;
+            }
+
+            input {
+            border-radius: 6px;
+            margin-bottom: 6px;
+            padding: 12px;
+            border: 1px solid rgba(50, 50, 93, 0.1);
+            height: 44px;
+            font-size: 16px;
+            width: 100%;
+            background: white;
+            }
+
+            .result-message {
+            line-height: 22px;
+            font-size: 16px;
+            }
+
+            .result-message a {
+            color: rgb(89, 111, 214);
+            font-weight: 600;
+            text-decoration: none;
             }
 
             .hidden {
             display: none;
             }
 
-            #payment-message {
+            #card-error {
             color: rgb(105, 115, 134);
-            font-size: 16px;
-            line-height: 20px;
-            padding-top: 12px;
-            text-align: center;
+            text-align: left;
+            font-size: 13px;
+            line-height: 17px;
+            margin-top: 12px;
             }
 
-            #payment-element {
-            margin-bottom: 24px;
+            #card-element {
+            border-radius: 4px 4px 0 0 ;
+            padding: 12px;
+            border: 1px solid rgba(50, 50, 93, 0.1);
+            height: 44px;
+            width: 100%;
+            background: white;
+            }
+
+            #payment-request-button {
+            margin-bottom: 32px;
             }
 
             /* Buttons and links */
             button {
             background: #5469d4;
-            font-family: Arial, sans-serif;
             color: #ffffff;
-            border-radius: 4px;
+            font-family: Arial, sans-serif;
+            border-radius: 0 0 4px 4px;
             border: 0;
             padding: 12px 16px;
             font-size: 16px;
@@ -146,8 +177,7 @@
 
             @media only screen and (max-width: 600px) {
             form {
-                width: 100vw;
-                min-width: initial;
+                width: 80vw;
             }
             }
         </style>
@@ -155,35 +185,32 @@
     <body>
 
          <!-- Display a payment form -->
-        <form id="payment-form">
-
-            <div id="payment-element">
-            <!--Stripe.js injects the Payment Element-->
-            </div>
+         <form id="payment-form">
+            <input placeholder="Nombre completo" id="card-holder-name" type="text">
+            <div id="card-element"><!--Stripe.js injects the Card Element--></div>
             <button id="submit">
-            <div class="spinner hidden" id="spinner"></div>
-            <span id="button-text">Pay now</span>
+              <div class="spinner hidden" id="spinner"></div>
+              <span id="button-text">Save card</span>
             </button>
-            <div id="payment-message" class="hidden"></div>
-
-
-            <div> <pre id="result"></pre> </div>
-        </form>
+            <p id="card-error" role="alert"></p>
+            <p class="result-message hidden">
+                Payment method was saved
+            </p>
+          </form>
 
 
         <script src="https://js.stripe.com/v3/"></script>
+        <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
 
         <script>
             // This is your test publishable API key.
-            const stripe = Stripe("pk_test_iqRhaR41MgTUF7mZ7iF4ETMt");
-
-            // The items the customer wants to buy
-            const items = [{ id: "xl-tshirt" }];
+            const stripe = Stripe("{{ config('services.stripe.key') }}");
 
             let elements;
+            let cardElement;
+            let clientSecret;
 
             initialize();
-            checkStatus();
 
             document
             .querySelector("#payment-form")
@@ -192,80 +219,83 @@
             // Fetches a payment intent and captures the client secret
             async function initialize() {
 
-                const  clientSecret  = '{{ $client_secret }}';
+                clientSecret  = '{{ $client_secret }}';
 
                 const appearance = {
                     theme: 'stripe',
                 };
+
                 elements = stripe.elements({ appearance, clientSecret });
 
-                const paymentElement = elements.create("payment");
-                paymentElement.mount("#payment-element");
+                let style = {
+                    base: {
+                        color: "#32325d",
+                        fontFamily: 'Arial, sans-serif',
+                        fontSmoothing: "antialiased",
+                        fontSize: "16px",
+                        "::placeholder": {
+                        color: "#32325d"
+                        }
+                    },
+                    invalid: {
+                        fontFamily: 'Arial, sans-serif',
+                        color: "#fa755a",
+                        iconColor: "#fa755a"
+                    }
+                };
+
+                cardElement = elements.create("card", { style: style });
+                cardElement.mount("#card-element");
             }
 
             async function handleSubmit(e) {
                 e.preventDefault();
                 setLoading(true);
 
-                const { error } = await stripe.confirmPayment({
-                    elements,
-                    confirmParams: {
-                    // Make sure to change this to your payment completion page
-                    return_url: "{{ url('simple-charge/metadata') }}",
-                    },
-                });
+                const cardHolderName = document.getElementById('card-holder-name');
 
-                // This point will only be reached if there is an immediate error when
-                // confirming the payment. Otherwise, your customer will be redirected to
-                // your `return_url`. For some payment methods like iDEAL, your customer will
-                // be redirected to an intermediate site first to authorize the payment, then
-                // redirected to the `return_url`.
-                if (error.type === "card_error" || error.type === "validation_error") {
-                    showMessage(error.message);
-                } else {
-                    showMessage("An unexpected error occurred.");
-                }
-
-                setLoading(false);
-            }
-
-            // Fetches the payment intent status after payment submission
-            async function checkStatus() {
-                const clientSecret = new URLSearchParams(window.location.search).get(
-                    "payment_intent_client_secret"
+                const { setupIntent, error } = await stripe.confirmCardSetup(
+                    clientSecret, {
+                        payment_method: {
+                            card: cardElement,
+                            billing_details: { name: cardHolderName.value }
+                        }
+                    }
                 );
 
-                if (!clientSecret) {
-                    return;
+
+                if (error) {
+                    showError(error.message);
+                    setLoading(false);
+                } else {
+                    saveCard(setupIntent);
                 }
-
-                const { paymentIntent } = await stripe.retrievePaymentIntent(clientSecret);
-
-                console.log(paymentIntent);
-
-                switch (paymentIntent.status) {
-                    case "succeeded":
-                    showMessage("Payment succeeded!");
-                    break;
-                    case "processing":
-                    showMessage("Your payment is processing.");
-                    break;
-                    case "requires_payment_method":
-                    showMessage("Your payment was not successful, please try again.");
-                    break;
-                    default:
-                    showMessage("Something went wrong.");
-                    break;
-                }
-
-                document.getElementById('result').innerHTML = JSON.stringify(paymentIntent, undefined, 1);
-
             }
+
+
+            const saveCard = function(setupIntent) {
+
+                var request = $.ajax({
+                    url: "{{ url('save-card') }}",
+                    method: "POST",
+                    dataType: "json",
+                    data: {
+                        paymentMethod: setupIntent.payment_method
+                    }
+                });
+
+                request.done(function( response ) {
+                    setLoading(false)
+                });
+
+                request.fail(function( jqXHR, textStatus ) {
+                });
+            };
 
             // ------- UI helpers -------
 
-            function showMessage(messageText) {
-            const messageContainer = document.querySelector("#payment-message");
+            function showError(messageText) {
+                const messageContainer = document.querySelector("#card-error");
 
                 messageContainer.classList.remove("hidden");
                 messageContainer.textContent = messageText;
