@@ -23,6 +23,7 @@ class BuildSimplePaymentPageGetController extends Controller
 
         return view('simple-payment', [
             'plan' => $plan,
+            'price' => $price,
             'client_secret' => $payment->client_secret
         ]);
     }

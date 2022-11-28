@@ -17,6 +17,10 @@ class GetUserAsStripeCustomerUseCase
     {
         $user = $this->repository->byEmail($email);
 
+        if (!$user) {
+            $user = $this->repository->create($email);
+        }
+
         if (!$user->stripe_id) {
             $user->createAsStripeCustomer();
         }

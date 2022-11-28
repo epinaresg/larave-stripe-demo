@@ -14,5 +14,6 @@ class VerifyCsrfToken extends Middleware
     protected $except = [
         'stripe/webhook',
         'save-card',
+        'login',
     ];
 }

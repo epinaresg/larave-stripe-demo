@@ -8,16 +8,21 @@ use App\UseCases\GetUserAsStripeCustomerUseCase;
 class ListPlansGetController extends Controller
 {
     private $useCase;
+    private $email;
     public function __construct()
     {
+        $this->email = session()->get('email');
+
         $this->useCase = new GetPlanPriceUseCase();
     }
 
     public function __invoke()
     {
-        $email = 'epinaresg@gmail.com';
+        if (!$this->email) {
+            return view('login');
+        }
 
-        (new GetUserAsStripeCustomerUseCase())->__invoke($email);
+        (new GetUserAsStripeCustomerUseCase())->__invoke($this->email);
 
         return view('list-plans', [
             'byMonth' => [

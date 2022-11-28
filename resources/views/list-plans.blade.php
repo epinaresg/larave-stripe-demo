@@ -8,19 +8,33 @@
 
     @vite(['resources/js/app.js'])
 
+
 </head>
 <body>
     <div id="app">
 
-        <div class="container mt-5">
-
+        <div class="container mt-2">
 
             <div class="row mb-4">
 
-                <div class="col-12">
-                    <a class="btn btn-outline-secondary" href="{{ url('save-card') }}">
-                        Add Card
+                <div class="col-10">
+                </div>
+                <div class="col-2">
+                    <a class="btn form-control btn-outline-danger" href="{{ url('logout') }}">
+                        Logout
                     </a>
+                </div>
+
+            </div>
+
+            <div class="row mb-5">
+
+                <div class="col-2">
+                    <a class="btn form-control btn-outline-secondary" href="{{ url('cards') }}">
+                        Credit cards list
+                    </a>
+                </div>
+                <div class="col-10">
                 </div>
 
             </div>
@@ -33,7 +47,6 @@
                             <h5 class="card-title mb-3">Bronze plan</h5>
 
                             <a href="{{ url('simple-payment/checkout/bronze') }}" class="btn btn-primary mb-2">PEN {{ $byMonth['bronze'] }} / One Payment</a>
-                            <a href="{{ url('subscription-charge/checkout/bronze') }}" class="btn btn-primary">PEN {{ $bySubscription['bronze'] }} / Subscription</a>
                         </div>
                     </div>
                 </div>
@@ -43,7 +56,6 @@
                             <h5 class="card-title mb-3">Silver plan</h5>
 
                             <a href="{{ url('simple-payment/checkout/silver') }}" class="btn btn-primary mb-2">PEN {{ $byMonth['silver'] }} / One Payment</a>
-                            <a href="{{ url('subscription-charge/checkout/silver') }}" class="btn btn-primary">PEN {{ $bySubscription['silver'] }} / Subscription</a>
                         </div>
                     </div>
                 </div>
@@ -53,7 +65,6 @@
                             <h5 class="card-title mb-3">Gold plan</h5>
 
                             <a href="{{ url('simple-payment/checkout/gold') }}" class="btn btn-primary mb-2">PEN {{ $byMonth['gold'] }} / One Payment</a>
-                            <a href="{{ url('subscription-charge/checkout/gold') }}" class="btn btn-primary">PEN {{ $bySubscription['gold'] }} / Subscription</a>
                         </div>
                     </div>
                 </div>

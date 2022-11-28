@@ -14,14 +14,9 @@
             }
 
             body {
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-            font-size: 16px;
-            -webkit-font-smoothing: antialiased;
-            display: flex;
-            justify-content: center;
-            align-content: center;
-            height: 100vh;
-            width: 100vw;
+                font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+                font-size: 16px;
+                -webkit-font-smoothing: antialiased;
             }
 
             form {
@@ -151,25 +146,56 @@
             }
             }
         </style>
+        @vite(['resources/js/app.js'])
+
     </head>
     <body>
 
-         <!-- Display a payment form -->
-        <form id="payment-form">
+        <div id="app">
 
-            <div id="payment-element">
-            <!--Stripe.js injects the Payment Element-->
+            <div class="container mt-2">
+
+                <div class="row mb-4">
+
+                    <div class="col-12 text-right mt-1">
+
+                        <a href="{{ url('/') }}">Back</a>
+
+                    </div>
+                </div>
+
+
+                <div class="row">
+
+                    <div class="col-3"></div>
+
+
+
+                    <div class="col-6">
+
+                        <!-- Display a payment form -->
+                        <form id="payment-form">
+
+                            <div id="payment-element">
+                            <!--Stripe.js injects the Payment Element-->
+                            </div>
+                            <button id="submit">
+                            <div class="spinner hidden" id="spinner"></div>
+                            <span id="button-text">Pay now | ${{ $price }}</span>
+                            </button>
+                            <div id="payment-message" class="hidden"></div>
+
+
+                            <div> <pre id="result"></pre> </div>
+                        </form>
+                    </div>
+
+                    <div class="col-3"></div>
+                </div>
+
             </div>
-            <button id="submit">
-            <div class="spinner hidden" id="spinner"></div>
-            <span id="button-text">Pay now</span>
-            </button>
-            <div id="payment-message" class="hidden"></div>
 
-
-            <div> <pre id="result"></pre> </div>
-        </form>
-
+        </div>
 
         <script src="https://js.stripe.com/v3/"></script>
 
